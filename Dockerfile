@@ -6,7 +6,8 @@ ENV PYTHONUNBUFFERED=1
 ENV NODE_PATH=/usr/lib/node_modules
 ENV SCRIPTS=/opt/build
 ENV SHELL=/bin/bash
-ENV ENV_URL=https://ghcr.io/netbeheer-nederland/build-dp:0.41
+ENV ENV_URL=https://ghcr.io/netbeheer-nederland/build-dp:0.39
+>>>>>>> d2e23e0 (Upgrade Dockerfile)
 ENV PATH=$PATH:/opt/build
 
 # Whether in CI/CD pipeline or not. Overridden by GitHub Actions if running there.
@@ -18,7 +19,7 @@ RUN apk add --no-cache \
     bash=5.3.3-r1 \
     bc=1.08.2-r0 \
     git=2.52.0-r0 \
-    nodejs=24.14.1-r0 \
+    nodejs=24.17.0-r0 \
     npm=11.11.0-r0 \
     uv=0.10.2-r0 \
     just=1.43.1-r0 \
@@ -35,7 +36,7 @@ SHELL ["/bin/bash", "-c"]
 RUN uv pip install --system \
     "linkml==1.10.0" \
     "linkml-asciidoc-generator @ git+https://github.com/Netbeheer-Nederland/linkml-asciidoc-generator.git@v0.7.1" \
-    "gen-linkml-profile @ git+https://github.com/Netbeheer-Nederland/gen-linkml-profile.git@v0.32.0" \
+    "gen-linkml-profile @ git+https://github.com/Netbeheer-Nederland/gen-linkml-profile.git@v0.33.0" \
     "check-jsonschema==0.32.0" \
     "pyshacl==0.31.0" \
     "jinja-cli==1.2.2" \

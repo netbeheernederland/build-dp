@@ -59,7 +59,7 @@ Ensure you are logged into GHCR:
 
 [source,shell]
 ....
-$ docker login
+$ docker login ghcr.io
 ....
 
 ==== `upcoming` version

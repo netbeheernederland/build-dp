@@ -91,7 +91,6 @@ _generate-schemas:
             --closed \
             output/model/{{fname}}.linkml.yml \
             > output/schemas/shacl/{{fname}}.shacl.ttl; \
-        cp output/schemas/shacl/{{fname}}.shacl.ttl output/schemas/shacl/{{fname}}.shacl.ttl; \
         echo "… OK."; \
         echo; \
         echo "Generated SHACL schema files at: output/schemas/shacl/"; \

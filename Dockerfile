@@ -14,11 +14,11 @@ ENV CI=false
 
 # Install required packages
 RUN apk add --no-cache \
-    vim=9.2.0602-r0 \
+    vim=9.2.1202-r0 \
     bash=5.3.3-r1 \
     bc=1.08.2-r0 \
     git=2.52.0-r0 \
-    nodejs=24.17.0-r0 \
+    nodejs=24.22.1-r0 \
     npm=11.11.0-r0 \
     uv=0.10.2-r0 \
     just=1.43.1-r0 \
@@ -26,7 +26,7 @@ RUN apk add --no-cache \
     openssh=10.2_p1-r0 \
     tar=1.35-r4 \
     grep=3.12-r0 \
-    jq=1.8.1-r0 \
+    jq=1.8.2-r0 \
     moreutils=0.70-r1
 
 SHELL ["/bin/bash", "-c"]

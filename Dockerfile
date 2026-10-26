@@ -6,8 +6,7 @@ ENV PYTHONUNBUFFERED=1
 ENV NODE_PATH=/usr/lib/node_modules
 ENV SCRIPTS=/opt/build
 ENV SHELL=/bin/bash
-ENV ENV_URL=https://ghcr.io/netbeheer-nederland/build-dp:0.39
->>>>>>> d2e23e0 (Upgrade Dockerfile)
+ENV ENV_URL=https://ghcr.io/netbeheernederland/build-dp:0.39
 ENV PATH=$PATH:/opt/build
 
 # Whether in CI/CD pipeline or not. Overridden by GitHub Actions if running there.
@@ -35,8 +34,8 @@ SHELL ["/bin/bash", "-c"]
 # Install Python project dependencies
 RUN uv pip install --system \
     "linkml==1.10.0" \
-    "linkml-asciidoc-generator @ git+https://github.com/Netbeheer-Nederland/linkml-asciidoc-generator.git@v0.7.1" \
-    "gen-linkml-profile @ git+https://github.com/Netbeheer-Nederland/gen-linkml-profile.git@v0.33.0" \
+    "linkml-asciidoc-generator @ git+https://github.com/netbeheernederland/linkml-asciidoc-generator.git@v0.7.1" \
+    "gen-linkml-profile @ git+https://github.com/netbeheernederland/gen-linkml-profile.git@v0.33.0" \
     "check-jsonschema==0.32.0" \
     "pyshacl==0.31.0" \
     "jinja-cli==1.2.2" \
@@ -92,6 +91,6 @@ USER $USER
 RUN touch ~/.bashrc && echo 'source /usr/share/bash-completion/completions/just' >> ~/.bashrc
 
 # Metadata
-LABEL org.opencontainers.image.source=https://github.com/netbeheer-nederland/build-dp
+LABEL org.opencontainers.image.source=https://github.com/netbeheernederland/build-dp
 LABEL org.opencontainers.image.description="Netbeheer Nederland environment for modeling data products and generating documentation and schemas."
 LABEL org.opencontainers.image.licenses=Apache-2.0

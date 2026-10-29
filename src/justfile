@@ -54,7 +54,7 @@ _generate-asciidoc:
         -o output/docs/adoc/modules/schema \
         -t /opt/build/templates \
         --render-diagrams \
-        output/model/{{fname}}.linkml.yml
+        output/model/{{replace(name, "-", "_")}}.linkml.yml
     echo "Adding schema documentation to nav…"
     yq -i '.nav += ["modules/schema/nav.adoc"]' output/docs/adoc/antora.yml
     echo 'Setting `version` key…'
@@ -78,10 +78,9 @@ _generate-schemas:
             --not-closed \
             output/model/{{fname}}.linkml.yml \
             > output/schemas/json_schema/{{fname}}.json_schema.json; \
-        cp output/schemas/json_schema/{{fname}}.json_schema.json output/schemas/json_schema/{{fname}}.json_schema.json; \
         echo "… OK."; \
         echo; \
-        echo "Generated JSON Schema files at: output/schemas/json_schema/"; \
+        echo "Generated JSON Schema at: output/schemas/json_schema/{{fname}}.json_schema.json"; \
         echo; \
     elif [ "{{exchange_format}}" == "application/ld+json" ]; then \
         echo "Generating SHACL…"; \
@@ -93,34 +92,23 @@ _generate-schemas:
             > output/schemas/shacl/{{fname}}.shacl.ttl; \
         echo "… OK."; \
         echo; \
-        echo "Generated SHACL schema files at: output/schemas/shacl/"; \
+        echo "Generated SHACL schema at: output/schemas/shacl/{{fname}}.shacl.ttl"; \
         echo; \
     fi
 
-_assemble-docs: && _create-xrefs
-    cp -r output/model output/docs/adoc/modules/schema/attachments/
-    cp output/docs/adoc/modules/schema/attachments/model/{{fname}}.linkml.yml \
-       output/docs/adoc/modules/schema/attachments/model/{{fname}}.linkml_{{version}}.yml
-
-    [ ! -d output/schemas ] || cp -r output/schemas output/docs/adoc/modules/schema/attachments/
-    [ ! -d output/examples ] || cp -r output/examples output/docs/adoc/modules/schema/attachments/
-
-    # NOTE: Generate versioned filename duplicates.
-    find output/{schemas,examples} -type f | sed 's/\(.*\)\.\([a-zA-Z0-9]\+\)$/cp \1.\2 \1.{{version}}.\2/' | sh
-
-_create-xrefs:
+_create_xrefs:
     #!/bin/bash
     shopt -s nullglob
     index_adoc=output/docs/adoc/modules/ROOT/pages/index.adoc
     attachments_dir=output/docs/adoc/modules/schema/attachments
-    shacl_resid=schemas/shacl/{{fname}}.shacl.{{version}}.ttl
-    json_schema_resid=schemas/json_schema/{{fname}}.json_schema.{{version}}.json
+    shacl_resid=schemas/shacl/{{fname}}.shacl.ttl
+    json_schema_resid=schemas/json_schema/{{fname}}.json_schema.json
 
     echo -e '\n\n== Artifacts\n\n' >> $index_adoc
 
     # LinkML model
     echo -e 'Model::\n[unstyled]' >> $index_adoc
-    echo '* xref:schema:attachment$model/{{fname}}.linkml.{{version}}.yml[LinkML]' >> $index_adoc
+    echo '* xref:schema:attachment$model/{{fname}}.linkml.yml[LinkML]' >> $index_adoc
 
     # Schemas
     echo -e 'Schemas::\n[unstyled]' >> $index_adoc
@@ -134,18 +122,23 @@ _create-xrefs:
     # Examples
     [ ! -d $attachments_dir/examples ] || echo -e 'Examples::\n[unstyled]' >> $index_adoc
     if [ "{{exchange_format}}" == "application/ld+json" ]; then \
-        for example_filepath in $attachments_dir/examples/jsonld/*.{{version}}.jsonld; do \
-            example_resid=${example_filepath#"$attachments_dir"}; \
+        for example_filepath in $attachments_dir/examples/jsonld/*.jsonld; do \
+            example_resid=${example_filepath#"$attachments_dir"/}; \
             example_title=$(jq -r '.["dcterms:title"]' $example_filepath); \
             echo "* xref:schema:attachment\$$example_resid[$example_title]" >> $index_adoc; \
         done; \
     elif [ "{{exchange_format}}" == "application/json" ]; then \
-        for example_filepath in $attachments_dir/examples/json/*.{{version}}.json; do \
+        for example_filepath in $attachments_dir/examples/json/*.json; do \
             example_resid=${example_filepath#"$attachments_dir"}; \
             example_title=$(jq -r '.title' $example_filepath); \
             echo "* xref:schema:attachment\$$example_resid[$example_title]" >> $index_adoc; \
         done; \
     fi
+
+_assemble-docs: && _create_xrefs
+    cp -r output/model output/docs/adoc/modules/schema/attachments/
+    [ ! -d output/schemas ] || cp -r output/schemas output/docs/adoc/modules/schema/attachments/
+    [ ! -d output/examples ] || cp -r output/examples output/docs/adoc/modules/schema/attachments/
 
 _post-process-schema:
     mkdir -p output/model
@@ -200,7 +193,6 @@ _generate-example-data:
                 convert \
                 $example_file \
                 --out $example_filepath; \
-            cp $example_filepath output/examples/jsonld/${example_filename%.*}.jsonld; \
             jq '."dcterms:conformsTo" = [{"@id": "{{schema_id}}"}]' $example_filepath | sponge $example_filepath; \
         done
     elif [ "{{exchange_format}}" == "application/json" ]; then \
@@ -212,7 +204,6 @@ _generate-example-data:
                 convert \
                 $example_file \
                 --out $example_filepath; \
-            cp $example_filepath output/examples/json/${example_filename%.*}.json; \
             jq '.conforms_to = "{{schema_id}}"' $example_filepath | sponge $example_filepath; \
         done
     else \
